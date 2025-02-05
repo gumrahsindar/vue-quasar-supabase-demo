@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import { ref, computed, reactive, nextTick } from "vue";
 import { uid, Notify } from "quasar";
+import supabase from "src/config/supabase";
+import { useShowErrorMessage } from "src/use/useShowErrorMessage";
 
 export const useStoreEntries = defineStore("entries", () => {
   /*
@@ -33,6 +35,8 @@ export const useStoreEntries = defineStore("entries", () => {
     //   paid: false
     // },
   ]);
+
+  const entriesLoaded = ref(false);
 
   const options = reactive({
     sort: false,
@@ -72,8 +76,40 @@ export const useStoreEntries = defineStore("entries", () => {
   /*
     actions
   */
-  const loadEntries = () => {
-    console.log("get entries from supabase");
+  const loadEntries = async () => {
+    entriesLoaded.value = false;
+
+    let { data, error } = await supabase.from("entries").select("*");
+    if (error) useShowErrorMessage(error.message);
+    if (data) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      entries.value = data;
+      entriesLoaded.value = true;
+      subscribeEntries();
+    }
+  };
+
+  const subscribeEntries = () => {
+    supabase
+      .channel("entries-channel")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "entries" },
+        (payload) => {
+          if (payload.eventType === "INSERT") {
+            entries.value.push(payload.new);
+          }
+          if (payload.eventType === "DELETE") {
+            const index = getEntryIndexById(payload.old.id);
+            entries.value.splice(index, 1);
+          }
+          if (payload.eventType === "UPDATE") {
+            const index = getEntryIndexById(payload.new.id);
+            Object.assign(entries.value[index], payload.new);
+          }
+        }
+      )
+      .subscribe();
   };
 
   const addEntry = (addEntryForm) => {
@@ -134,6 +170,7 @@ export const useStoreEntries = defineStore("entries", () => {
     // state
     entries,
     options,
+    entriesLoaded,
 
     // getters
     balance,
