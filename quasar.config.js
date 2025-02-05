@@ -41,7 +41,7 @@ module.exports = configure(function (/* ctx */) {
     build: {
       env: {
         SUPABASE_URL: "https://tybnblwiniswrgeipplz.supabase.co",
-        SUPABSE_KEY:
+        SUPABASE_KEY:
           "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR5Ym5ibHdpbmlzd3JnZWlwcGx6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg2NzQ4NTMsImV4cCI6MjA1NDI1MDg1M30.CfJJHCCkUki48jRCDBcJLo-FSM92XxmZP4PRyW8ga20",
       },
       target: {
