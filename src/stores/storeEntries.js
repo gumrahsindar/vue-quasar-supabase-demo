@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, computed, reactive, nextTick } from "vue";
-import { uid, Notify } from "quasar";
+import { Notify } from "quasar";
 import supabase from "src/config/supabase";
 import { useShowErrorMessage } from "src/use/useShowErrorMessage";
 
@@ -112,28 +112,42 @@ export const useStoreEntries = defineStore("entries", () => {
       .subscribe();
   };
 
-  const addEntry = (addEntryForm) => {
+  const addEntry = async (addEntryForm) => {
     const newEntry = Object.assign({}, addEntryForm, {
-      id: uid(),
       paid: false,
     });
     if (newEntry.amount === null) newEntry.amount = 0;
-    entries.value.push(newEntry);
+    // entries.value.push(newEntry);
+
+    const { error } = await supabase
+      .from("entries")
+      .insert([newEntry])
+      .select();
+
+    if (error) useShowErrorMessage(error.message);
   };
 
-  const deleteEntry = (entryId) => {
-    const index = getEntryIndexById(entryId);
-    entries.value.splice(index, 1);
-    removeSlideItemIfExists(entryId);
-    Notify.create({
-      message: "Entry deleted",
-      position: "top",
-    });
+  const deleteEntry = async (entryId) => {
+    const { error } = await supabase.from("entries").delete().eq("id", entryId);
+
+    if (error) useShowErrorMessage(error.message);
+    else {
+      removeSlideItemIfExists(entryId);
+      Notify.create({
+        message: "Entry deleted",
+        position: "top",
+      });
+    }
   };
 
-  const updateEntry = (entryId, updates) => {
-    const index = getEntryIndexById(entryId);
-    Object.assign(entries.value[index], updates);
+  const updateEntry = async (entryId, updates) => {
+    const { data, error } = await supabase
+      .from("entries")
+      .update(updates)
+      .eq("id", entryId)
+      .select();
+
+    if (error) useShowErrorMessage(error.message);
   };
 
   const sortEnd = ({ oldIndex, newIndex }) => {
