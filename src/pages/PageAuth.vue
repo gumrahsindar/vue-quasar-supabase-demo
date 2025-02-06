@@ -1,6 +1,7 @@
 <script setup>
 import { useQuasar } from "quasar";
 import ToolbarTitle from "src/components/Layout/ToolbarTitle.vue";
+import { useStoreAuth } from "src/stores/storeAuth";
 import { useLightOrDark } from "src/use/useLightOrDark";
 import { computed, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
@@ -8,6 +9,8 @@ import { useRouter } from "vue-router";
 const tab = ref("register");
 
 const router = useRouter();
+
+const storeAuth = useStoreAuth();
 
 const submitButtonTitle = computed(() => {
   return tab.value === "login" ? "Login" : "Register";
@@ -33,9 +36,9 @@ function formSubmit() {
 
 function formSubmitSuccess() {
   if (tab.value === "login") {
-    console.log("Login user with these credentials:", credentials);
+    storeAuth.loginUser(credentials);
   } else {
-    console.log("Register user with these credentials:", credentials);
+    storeAuth.registerUser(credentials);
   }
 
   router.push("/");
