@@ -1,8 +1,6 @@
 <template>
   <q-layout view="hHh lpR lFf">
-    <q-header
-      :elevated="useLightOrDark(true, false)"
-    >
+    <q-header :elevated="useLightOrDark(true, false)">
       <q-toolbar>
         <q-btn
           flat
@@ -13,16 +11,9 @@
           @click="toggleLeftDrawer"
         />
 
-        <q-toolbar-title>
-          <div class="absolute-center">
-            <div class="toolbar-title-text">
-              <q-icon name="savings" /> 
-              Moneyballs
-            </div>
-          </div>
-        </q-toolbar-title>
+        <ToolbarTitle />
 
-        <q-btn 
+        <q-btn
           v-if="$route.fullPath === '/'"
           @click="storeEntries.options.sort = !storeEntries.options.sort"
           :label="!storeEntries.options.sort ? 'Sort' : 'Done'"
@@ -30,7 +21,6 @@
           no-caps
           dense
         />
-
       </q-toolbar>
     </q-header>
 
@@ -43,18 +33,21 @@
       bordered
     >
       <q-list>
-        <q-item-label
-          class="text-white"
-          header
-        >
-          Navigation
-        </q-item-label>
+        <q-item-label class="text-white" header> Navigation </q-item-label>
 
-        <NavLink
-          v-for="link in navLinks"
-          :key="link.title"
-          v-bind="link"
-        />
+        <NavLink v-for="link in navLinks" :key="link.title" v-bind="link" />
+
+        <q-separator spaced />
+
+        <q-item to="/auth" clickable class="text-white" tag="a">
+          <q-item-section avatar>
+            <q-icon name="logout" />
+          </q-item-section>
+
+          <q-item-section>
+            <q-item-label>Logout</q-item-label>
+          </q-item-section>
+        </q-item>
 
         <q-item
           v-if="$q.platform.is.electron"
@@ -63,9 +56,7 @@
           class="text-white absolute-bottom"
           tag="a"
         >
-          <q-item-section
-            avatar
-          >
+          <q-item-section avatar>
             <q-icon name="power_settings_new" />
           </q-item-section>
 
@@ -83,56 +74,57 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useQuasar } from 'quasar'
-import { useStoreEntries } from 'src/stores/storeEntries'
-import { useLightOrDark } from 'src/use/useLightOrDark'
-import NavLink from 'components/Nav/NavLink.vue'
+import { ref } from "vue";
+import { useQuasar } from "quasar";
+import { useStoreEntries } from "src/stores/storeEntries";
+import { useLightOrDark } from "src/use/useLightOrDark";
+import NavLink from "components/Nav/NavLink.vue";
+import ToolbarTitle from "src/components/Layout/ToolbarTitle.vue";
 
 defineOptions({
-  name: 'MainLayout'
-})
+  name: "MainLayout",
+});
 
 const $q = useQuasar(),
-      storeEntries = useStoreEntries()
+  storeEntries = useStoreEntries();
 
 const navLinks = [
   {
-    title: 'Entries',
-    icon: 'savings',
-    link: '/'
+    title: "Entries",
+    icon: "savings",
+    link: "/",
   },
   {
-    title: 'Settings',
-    icon: 'settings',
-    link: '/settings'
-  }
-]
+    title: "Settings",
+    icon: "settings",
+    link: "/settings",
+  },
+];
 
-const leftDrawerOpen = ref(false)
+const leftDrawerOpen = ref(false);
 
-function toggleLeftDrawer () {
-  leftDrawerOpen.value = !leftDrawerOpen.value
+function toggleLeftDrawer() {
+  leftDrawerOpen.value = !leftDrawerOpen.value;
 }
 
 const quitApp = () => {
   $q.dialog({
-    title: 'Confirm',
-    message: 'Really quit Moneyballs?',
+    title: "Confirm",
+    message: "Really quit Moneyballs?",
     cancel: true,
     persistent: true,
     html: true,
     ok: {
-      label: 'Quit',
-      color: 'negative',
-      noCaps: true
+      label: "Quit",
+      color: "negative",
+      noCaps: true,
     },
     cancel: {
-      color: 'primary',
-      noCaps: true
-    }
+      color: "primary",
+      noCaps: true,
+    },
   }).onOk(() => {
-    if ($q.platform.is.electron) ipcRenderer.send('quit-app')
-  })
-}
+    if ($q.platform.is.electron) ipcRenderer.send("quit-app");
+  });
+};
 </script>

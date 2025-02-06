@@ -5,7 +5,8 @@
 
 // dark overrides
 .body--dark {
-  .bg-primary, .q-layout__section--marginal {
+  .bg-primary,
+  .q-layout__section--marginal {
     background-color: $primary-dark !important;
   }
   .q-drawer {
@@ -24,7 +25,7 @@
 }
 
 // number inputs
-input::-webkit-outer-spin-button, 
+input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   margin-left: 10px;
 }
@@ -77,4 +78,10 @@ input::-webkit-inner-spin-button {
   .q-field--error .q-field__bottom {
     color: $negative-light;
   }
+}
+
+// auth page
+
+.auth {
+  min-width: 320px;
 }
