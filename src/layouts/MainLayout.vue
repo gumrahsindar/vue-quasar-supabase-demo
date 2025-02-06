@@ -41,7 +41,6 @@
 
         <q-item
           @click="storeAuth.logoutUser"
-          to="/auth"
           clickable
           class="text-white"
           tag="a"
@@ -52,6 +51,12 @@
 
           <q-item-section>
             <q-item-label>Logout</q-item-label>
+            <q-item-label
+              v-if="storeAuth.userDetails"
+              class="text-white"
+              caption
+              >{{ storeAuth.userDetails.email }}</q-item-label
+            >
           </q-item-section>
         </q-item>
 

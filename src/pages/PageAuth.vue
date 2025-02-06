@@ -4,11 +4,8 @@ import ToolbarTitle from "src/components/Layout/ToolbarTitle.vue";
 import { useStoreAuth } from "src/stores/storeAuth";
 import { useLightOrDark } from "src/use/useLightOrDark";
 import { computed, reactive, ref } from "vue";
-import { useRouter } from "vue-router";
 
 const tab = ref("register");
-
-const router = useRouter();
 
 const storeAuth = useStoreAuth();
 
@@ -40,8 +37,6 @@ function formSubmitSuccess() {
   } else {
     storeAuth.registerUser(credentials);
   }
-
-  router.push("/");
 }
 </script>
 

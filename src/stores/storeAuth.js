@@ -1,29 +1,37 @@
 import { defineStore } from "pinia";
 import supabase from "src/config/supabase";
 import { useShowErrorMessage } from "src/use/useShowErrorMessage";
+import { reactive } from "vue";
+import { useRouter } from "vue-router";
 
 export const useStoreAuth = defineStore("auth", () => {
+  const userDetailsDefault = {
+    id: null,
+    email: null,
+  };
+
+  const userDetails = reactive({
+    ...userDetailsDefault,
+  });
+
   const init = () => {
-    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+    const router = useRouter();
+    supabase.auth.onAuthStateChange((event, session) => {
       console.log(event, session);
 
-      if (event === "INITIAL_SESSION") {
-        // handle initial session
-      } else if (event === "SIGNED_IN") {
-        // handle sign in event
+      if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
+        if (session !== null) {
+          // handle sign in event
+          userDetails.id = session.user.id;
+          userDetails.email = session.user.email;
+          router.push("/");
+        }
       } else if (event === "SIGNED_OUT") {
         // handle sign out event
-      } else if (event === "PASSWORD_RECOVERY") {
-        // handle password recovery event
-      } else if (event === "TOKEN_REFRESHED") {
-        // handle token refreshed event
-      } else if (event === "USER_UPDATED") {
-        // handle user updated event
+        Object.assign(userDetails, userDetailsDefault);
+        router.replace("/auth");
       }
     });
-
-    // call unsubscribe to remove the callback
-    data.subscription.unsubscribe();
   };
 
   const registerUser = async ({ email, password }) => {
@@ -33,7 +41,7 @@ export const useStoreAuth = defineStore("auth", () => {
     });
 
     if (error) useShowErrorMessage(error.message);
-    if (data) console.log("data", data);
+    // if (data) console.log("data", data);
   };
   const loginUser = async ({ email, password }) => {
     let { data, error } = await supabase.auth.signInWithPassword({
@@ -42,16 +50,18 @@ export const useStoreAuth = defineStore("auth", () => {
     });
 
     if (error) useShowErrorMessage(error.message);
-    if (data) console.log("data", data);
+    // if (data) console.log("data", data);
   };
 
   const logoutUser = async () => {
     let { error } = await supabase.auth.signOut();
     if (error) useShowErrorMessage(error.message);
-    else console.log("Logout successful");
+    // else console.log("Logout successful");
   };
 
   return {
+    userDetails,
+    init,
     registerUser,
     logoutUser,
     loginUser,
