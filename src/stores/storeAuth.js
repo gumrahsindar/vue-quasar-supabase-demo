@@ -33,6 +33,7 @@ export const useStoreAuth = defineStore("auth", () => {
         Object.assign(userDetails, userDetailsDefault);
         router.replace("/auth");
         storeEntries.clearEntries();
+        storeEntries.unsubscribeEntries();
       }
     });
   };
