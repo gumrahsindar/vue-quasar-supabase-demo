@@ -3,6 +3,7 @@ import supabase from "src/config/supabase";
 import { useShowErrorMessage } from "src/use/useShowErrorMessage";
 import { reactive } from "vue";
 import { useRouter } from "vue-router";
+import { useStoreEntries } from "./storeEntries";
 
 export const useStoreAuth = defineStore("auth", () => {
   const userDetailsDefault = {
@@ -15,7 +16,8 @@ export const useStoreAuth = defineStore("auth", () => {
   });
 
   const init = () => {
-    const router = useRouter();
+    const router = useRouter(),
+      storeEntries = useStoreEntries();
     supabase.auth.onAuthStateChange((event, session) => {
       console.log(event, session);
 
@@ -25,6 +27,7 @@ export const useStoreAuth = defineStore("auth", () => {
           userDetails.id = session.user.id;
           userDetails.email = session.user.email;
           router.push("/");
+          storeEntries.loadEntries();
         }
       } else if (event === "SIGNED_OUT") {
         // handle sign out event
