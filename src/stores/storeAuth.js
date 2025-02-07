@@ -18,9 +18,8 @@ export const useStoreAuth = defineStore("auth", () => {
   const init = () => {
     const router = useRouter(),
       storeEntries = useStoreEntries();
-    supabase.auth.onAuthStateChange((event, session) => {
-      console.log(event, session);
 
+    supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
         if (session !== null) {
           // handle sign in event
@@ -33,6 +32,7 @@ export const useStoreAuth = defineStore("auth", () => {
         // handle sign out event
         Object.assign(userDetails, userDetailsDefault);
         router.replace("/auth");
+        storeEntries.clearEntries();
       }
     });
   };

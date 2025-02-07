@@ -43,7 +43,6 @@ export const useStoreEntries = defineStore("entries", () => {
   ]);
 
   const entriesLoaded = ref(false);
-  const storeAuth = useStoreAuth();
 
   const options = reactive({
     sort: false,
@@ -84,6 +83,7 @@ export const useStoreEntries = defineStore("entries", () => {
     actions
   */
   const loadEntries = async () => {
+    const storeAuth = useStoreAuth();
     entriesLoaded.value = false;
 
     let { data, error } = await supabase
@@ -101,11 +101,18 @@ export const useStoreEntries = defineStore("entries", () => {
   };
 
   const subscribeEntries = () => {
+    const storeAuth = useStoreAuth();
+
     supabase
       .channel("entries-channel")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "entries" },
+        {
+          event: "*",
+          schema: "public",
+          table: "entries",
+          filter: `user_id=eq.${storeAuth.userDetails.id}`,
+        },
         (payload) => {
           if (payload.eventType === "INSERT") {
             entries.value.push(payload.new);
@@ -123,10 +130,15 @@ export const useStoreEntries = defineStore("entries", () => {
       .subscribe();
   };
 
+  const clearEntries = () => {
+    entries.value = [];
+  };
+
   const addEntry = async (addEntryForm) => {
     const newEntry = Object.assign({}, addEntryForm, {
       paid: false,
       order: generateOrderNumber(),
+      user_id: useStoreAuth().userDetails.id,
     });
     if (newEntry.amount === null) newEntry.amount = 0;
     // entries.value.push(newEntry);
@@ -232,6 +244,7 @@ export const useStoreEntries = defineStore("entries", () => {
 
     // actions
     loadEntries,
+    clearEntries,
     addEntry,
     deleteEntry,
     updateEntry,
