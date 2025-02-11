@@ -191,8 +191,13 @@ export const useStoreEntries = defineStore("entries", () => {
   };
 
   const updateEntryOrderNumbers = async () => {
+    const storeAuth = useStoreAuth();
     const updatedEntries = entries.value.map((entry, index) => {
-      return { id: entry.id, order: index + 1 };
+      return {
+        id: entry.id,
+        order: index + 1,
+        user_id: storeAuth.userDetails.id,
+      };
     });
 
     const { error } = await supabase
