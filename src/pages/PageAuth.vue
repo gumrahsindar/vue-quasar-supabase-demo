@@ -1,11 +1,13 @@
 <script setup>
 import { useQuasar } from "quasar";
 import ToolbarTitle from "src/components/Layout/ToolbarTitle.vue";
+import supabase from "src/config/supabase";
 import { useStoreAuth } from "src/stores/storeAuth";
 import { useLightOrDark } from "src/use/useLightOrDark";
-import { computed, reactive, ref } from "vue";
+import { useShowErrorMessage } from "src/use/useShowErrorMessage";
+import { computed, onMounted, reactive, ref } from "vue";
 
-const tab = ref("register");
+const tab = ref("login");
 
 const storeAuth = useStoreAuth();
 
@@ -19,6 +21,19 @@ const credentials = reactive({
 });
 
 const $q = useQuasar();
+
+const entriesCount = ref(null);
+
+onMounted(async () => {
+  // get entries count from supabase
+  let { data: stats, error } = await supabase
+    .from("stats")
+    .select("*")
+    .eq("name", "entries_count");
+
+  if (error) useShowErrorMessage(error.message);
+  else entriesCount.value = stats[0].value;
+});
 
 function formSubmit() {
   if (!credentials.email || !credentials.password) {
@@ -45,6 +60,16 @@ function formSubmitSuccess() {
     <q-card class="auth bg-primary text-white q-pa-lg">
       <q-card-section>
         <ToolbarTitle />
+      </q-card-section>
+
+      <q-card-section class="q-pb-none">
+        <q-banner
+          :class="{ 'fade-in': entriesCount }"
+          class="entries-count bg-primary text-white text-center text-italic"
+        >
+          <div>Over {{ entriesCount }} Entries have been</div>
+          <div>created with Moneyballs!</div>
+        </q-banner>
       </q-card-section>
 
       <q-card-section>

@@ -157,7 +157,17 @@ export const useStoreEntries = defineStore("entries", () => {
       .select();
 
     if (error) useShowErrorMessage(error.message);
+    // else {
+    //   updateEntriesCount();
+    // }
   };
+
+  // NOTE: not used - here as an example ofhow to fire a db function
+  // const updateEntriesCount = async () => {
+  //   const { error } = await supabase.rpc("increment_entries_count");
+  //   if (error) useShowErrorMessage(error.message);
+  //   else console.log("Entries count incremented");
+  // };
 
   const deleteEntry = async (entryId) => {
     const { error } = await supabase.from("entries").delete().eq("id", entryId);
