@@ -14,6 +14,7 @@
               dense
               outlined
               v-model="storeSettings.profile.avatarFile"
+              @update:model-value="storeSettings.uploadAvatar"
             >
               <template v-slot:prepend>
                 <q-icon name="attach_file" />

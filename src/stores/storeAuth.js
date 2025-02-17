@@ -25,7 +25,8 @@ export const useStoreAuth = defineStore("auth", () => {
           // handle sign in event
           userDetails.id = session.user.id;
           userDetails.email = session.user.email;
-          router.push("/");
+          // router.push("/");
+          router.push("/settings");
           storeEntries.loadEntries();
         }
       } else if (event === "SIGNED_OUT") {

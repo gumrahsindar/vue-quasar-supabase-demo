@@ -1,6 +1,9 @@
 import { defineStore } from "pinia";
 import { reactive, watch } from "vue";
 import { Dark, LocalStorage } from "quasar";
+import supabase from "src/config/supabase";
+import { useStoreAuth } from "./storeAuth";
+import { useShowErrorMessage } from "src/use/useShowErrorMessage";
 
 export const useStoreSettings = defineStore("settings", () => {
   /*
@@ -50,6 +53,19 @@ export const useStoreSettings = defineStore("settings", () => {
     if (savedSettings) Object.assign(settings, savedSettings);
   };
 
+  const uploadAvatar = async (file) => {
+    const storeAuth = useStoreAuth();
+    const folderPath = storeAuth.userDetails.id;
+    const fileName = `${Date.now()}_${file.name.replaceAll(" ", "_")}`;
+
+    const { data, error } = await supabase.storage
+      .from("avatars")
+      .upload(`${folderPath}/${fileName}`, file);
+
+    if (error) useShowErrorMessage(error.message);
+    if (data) console.log("data", data);
+  };
+
   /*
     return
   */
@@ -63,5 +79,6 @@ export const useStoreSettings = defineStore("settings", () => {
 
     // actions
     loadSettings,
+    uploadAvatar,
   };
 });
